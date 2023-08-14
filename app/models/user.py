@@ -11,6 +11,9 @@ class User(db.Model):
   phone_number = db.Column(db.String(20))
   date_joined = db.Column(db.DateTime, default=datetime.utcnow)
 
+  businesses = db.relationship("Business", back_populates="owner")
+  bookings = db.relationship("Booking", back_populates="user")
+
   def __init__(self, email, password, first_name, last_name, phone_number=None):
     self.email = email
     self.password_hash = generate_password_hash(password)

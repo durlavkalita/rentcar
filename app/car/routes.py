@@ -1,8 +1,9 @@
 from app import db
 from app.car import bp
 from flask_jwt_extended import jwt_required, get_jwt_identity
-from app.models import Car, Business
+from app.models import Car, Business, Booking
 from flask import request, jsonify
+from datetime import datetime
 
 @bp.route("/create", methods=['POST'])
 @jwt_required()
@@ -83,6 +84,67 @@ def get_car_by_id(id):
       return jsonify(car_data), 200
     else:
       return jsonify(message="car not found"), 404
+  except Exception as e:
+    return jsonify(error=str(e)), 500
+  
+@bp.route("/<int:id>/bookings/create", methods=["POST"])
+@jwt_required()
+def book_car_by_id(id):
+  try:
+    current_user_id = get_jwt_identity()
+    car = Car.query.get(id)
+    if not car:
+      return jsonify(message="Car not found"), 404
+    elif car.available != True:
+      return jsonify(message="car not available"), 403
+
+    data = request.json
+    pickup_date = datetime.strptime(data.get("pickup_date"), "%Y-%m-%d")
+    return_date = datetime.strptime(data.get("return_date"), "%Y-%m-%d")
+
+    rental_price_per_day = car.price_per_day
+
+    # Calculate the number of rental days
+    rental_days = (return_date - pickup_date).days + 1
+
+    # Calculate the total price
+    total_price = rental_price_per_day * rental_days
+
+    new_booking = Booking(
+        user_id=current_user_id,
+        car_id=id,
+        pickup_date=pickup_date,
+        return_date=return_date,
+        total_price=total_price
+    )
+
+    db.session.add(new_booking)
+    db.session.commit()
+
+    return jsonify(message="Booking created successfully"), 201
+  except Exception as e:
+    return jsonify(error=str(e)), 500
+
+@bp.route("/<int:id>/bookings", methods=['GET'])
+def get_bookings_by_car_id(id):
+  try:
+    car = Car.query.get(id)
+    if not car:
+      return jsonify(message="Car not found"), 404
+    bookings = Booking.query.filter_by(car_id = id)
+    booking_list = []
+    for booking in bookings:
+      booking_data = {
+        "id": booking.id,
+        "user": booking.user.first_name,
+        "car": booking.car.brand,
+        "pickup_date": booking.pickup_date,
+        "return_date": booking.return_date,
+        "total_price": booking.total_price,
+        "created_at": booking.created_at
+      }
+      booking_list.append(booking_data)
+    return jsonify(booking_list), 200
   except Exception as e:
     return jsonify(error=str(e)), 500
   

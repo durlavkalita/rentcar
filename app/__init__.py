@@ -20,7 +20,7 @@ def create_app(config_class = Config):
     app.register_blueprint(main_bp)
 
     from app.auth import bp as auth_bp
-    app.register_blueprint(auth_bp, url_prefix="/")
+    app.register_blueprint(auth_bp)
 
     from app.business import bp as business_bp
     app.register_blueprint(business_bp, url_prefix="/business")

@@ -1,6 +1,6 @@
 from app.auth import bp
 from flask import request, jsonify
-from flask_jwt_extended import create_access_token, unset_jwt_cookies
+from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
 from app.models.user import User
 from app import db
 
@@ -57,5 +57,25 @@ def login():
     access_token = create_access_token(identity=user.id)
 
     return jsonify(message="User logged in successfully", access_token=access_token), 200
+  except Exception as e:
+    return jsonify(error=str(e)), 500
+
+@bp.route("/profile", methods=['GET'])
+@jwt_required()
+def get_user_profile():
+  current_user_id = get_jwt_identity()
+  try:
+    user = User.query.get(current_user_id)
+    if user:
+      user_data = {
+        "id": user.id,
+        "email": user.email,
+        "first_name": user.first_name,
+        "last_name": user.last_name,
+        "phone_number": user.phone_number
+      }
+      return jsonify(user_data), 200
+    else:
+      return jsonify(message="user not found"), 404
   except Exception as e:
     return jsonify(error=str(e)), 500

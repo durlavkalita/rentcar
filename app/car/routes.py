@@ -147,4 +147,44 @@ def get_bookings_by_car_id(id):
     return jsonify(booking_list), 200
   except Exception as e:
     return jsonify(error=str(e)), 500
+
+@bp.route("/<int:id>/edit", methods=['PUT'])
+@jwt_required()
+def edit_car_by_id(id):
+  try:
+    current_user_id = get_jwt_identity()
+    car = Car.query.get(id)
+    if not car:
+      return jsonify(message="Car not found"), 404
+    if car.business.owner_id != current_user_id:
+      return jsonify(message="Not authorized to update car details"), 403
+    data = request.json
+    
+    car.brand = data.get("brand", car.brand)
+    car.model = data.get("model", car.model)
+    car.year = data.get("year", car.year)
+    car.color = data.get("color", car.color)
+    car.available = data.get("available", car.available)
+    car.price_per_day = data.get("price_per_day", car.price_per_day)
+    db.session.commit()
+
+    return jsonify(message="Car details updated successfully"), 200
+  except Exception as e:
+    return jsonify(error=str(e)), 500
+
+@bp.route("/<int:id>", methods=['DELETE'])
+@jwt_required()
+def delete_car_by_id(id):
+  try:
+    current_user_id = get_jwt_identity()
+    car = Car.query.get(id)
+    if not car:
+      return jsonify(message="Car not found"), 404
+    if car.business.owner_id != current_user_id:
+      return jsonify(message="Unauthorized"), 403
+    db.session.delete(car)
+    db.session.commit()
+    return jsonify(message="Car deleted successfully"), 200
+  except Exception as e:
+    return jsonify(error=str(e)), 500
   

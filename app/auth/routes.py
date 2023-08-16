@@ -79,3 +79,23 @@ def get_user_profile():
       return jsonify(message="user not found"), 404
   except Exception as e:
     return jsonify(error=str(e)), 500
+
+@bp.route("/profile/booking", methods=["GET"])
+@jwt_required()
+def get_profile_booking_list():
+  try:
+    current_user_id = get_jwt_identity()
+    user = User.query.get(current_user_id)
+    booking_list = []
+    for booking in user.bookings:
+      booking_data = {
+        "pickup_date": booking.pickup_date,
+        "return_date": booking.return_date,
+        "car_id": booking.car_id,
+        "total_price": booking.total_price,
+        "created_at": booking.created_at
+      }
+      booking_list.append(booking_data)
+    return jsonify(booking_list), 200
+  except Exception as e:
+    return jsonify(error=str(e)), 500

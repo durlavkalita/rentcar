@@ -1,0 +1,345 @@
+openapi: 3.0.0
+info:
+  title: Car Rental API
+  version: "1.0"
+servers:
+  - url: http://localhost:5000 # Replace with your actual server URL
+    description: Local development server
+paths:
+  /auth/register:
+    post:
+      summary: Register a new user
+      tags: [Authentication]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                email:
+                  type: string
+                password:
+                  type: string
+                # Add other properties here
+      responses:
+        "201":
+          description: User registered successfully
+        # Add other responses here
+
+  /auth/login:
+    post:
+      summary: Log in and obtain an access token
+      tags: [Authentication]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                password:
+                  type: string
+              required:
+                - username
+                - password
+      responses:
+        "200":
+          description: Login successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  access_token:
+                    type: string
+                  # Add other properties here
+
+  /auth/profile:
+    get:
+      summary: Get user profile
+      tags: [Authentication]
+      responses:
+        "200":
+          description: User profile
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                  username:
+                    type: string
+                  email:
+                    type: string
+                  first_name:
+                    type: string
+                  last_name:
+                    type: string
+                  phone_number:
+                    type: string
+                  date_joined:
+                    type: string
+                    format: date-time
+                  # Add other properties here
+                # Add other response properties here
+
+  /auth/profile/booking:
+    get:
+      summary: Get user's bookings
+      tags: [Authentication]
+      responses:
+        "200":
+          description: List of user's bookings
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Booking"
+                # Add other response properties here
+                # Reference the Booking schema here
+
+  /business/register:
+    post:
+      summary: Register a new business
+      tags: [Business]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Business"
+      responses:
+        "201":
+          description: Business registered successfully
+
+  /business/:
+    get:
+      summary: Get a list of businesses
+      tags: [Business]
+      responses:
+        "200":
+          description: List of businesses
+
+  /business/{business_id}:
+    get:
+      summary: Get details of a business by ID
+      tags: [Business]
+      parameters:
+        - in: path
+          name: business_id
+          schema:
+            type: integer
+          required: true
+      responses:
+        "200":
+          description: Business details
+
+  /business/{business_id}/cars:
+    get:
+      summary: Get cars associated with a business by ID
+      tags: [Business]
+      parameters:
+        - in: path
+          name: business_id
+          schema:
+            type: integer
+          required: true
+      responses:
+        "200":
+          description: List of cars for the business
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Car"
+                # Add other response properties here
+                # Reference the Car schema here
+
+  /cars/create:
+    post:
+      summary: Create a new car
+      tags: [Car]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Car"
+      responses:
+        "201":
+          description: Car created successfully
+
+  /cars:
+    get:
+      summary: Get a list of cars
+      tags: [Car]
+      responses:
+        "200":
+          description: List of cars
+
+  /cars/{car_id}:
+    get:
+      summary: Get details of a car by ID
+      tags: [Car]
+      parameters:
+        - in: path
+          name: car_id
+          schema:
+            type: integer
+          required: true
+      responses:
+        "200":
+          description: Car details
+
+    delete:
+      summary: Delete a car by ID
+      tags: [Car]
+      parameters:
+        - in: path
+          name: car_id
+          schema:
+            type: integer
+          required: true
+      responses:
+        "204":
+          description: Car deleted successfully
+
+  /cars/{car_id}/bookings/create:
+    post:
+      summary: Create a booking for a car by ID
+      tags: [Car]
+      parameters:
+        - in: path
+          name: car_id
+          schema:
+            type: integer
+          required: true
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Booking"
+      responses:
+        "201":
+          description: Booking created successfully
+
+  /cars/{car_id}/bookings:
+    get:
+      summary: Get bookings for a car by ID
+      tags: [Car]
+      parameters:
+        - in: path
+          name: car_id
+          schema:
+            type: integer
+          required: true
+      responses:
+        "200":
+          description: List of bookings for the car
+
+  /cars/{car_id}/edit:
+    put:
+      summary: Edit car details by ID
+      tags: [Car]
+      parameters:
+        - in: path
+          name: car_id
+          schema:
+            type: integer
+          required: true
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Car"
+      responses:
+        "200":
+          description: Car details updated successfully
+
+components:
+  schemas:
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+        email:
+          type: string
+        first_name:
+          type: string
+        last_name:
+          type: string
+        phone_number:
+          type: string
+        date_joined:
+          type: string
+          format: date-time
+        password:
+          type: string
+
+    Business:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        description:
+          type: string
+        owner:
+          type: integer
+        location:
+          type: string
+
+    Car:
+      type: object
+      properties:
+        id:
+          type: integer
+        brand:
+          type: string
+        model:
+          type: string
+        year:
+          type: integer
+        color:
+          type: string
+        license_plate:
+          type: string
+        price_per_day:
+          type: number
+        available:
+          type: boolean
+        business:
+          type: integer
+
+    Booking:
+      type: object
+      properties:
+        id:
+          type: integer
+        user:
+          type: integer
+        car:
+          type: integer
+        pickup_date:
+          type: string
+          format: date
+        return_date:
+          type: string
+          format: date
+        total_price:
+          type: number
+        created_at:
+          type: string
+          format: date-time

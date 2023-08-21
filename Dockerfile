@@ -12,11 +12,13 @@ COPY requirements.txt .
 # Install any needed packages specified in requirements.txt
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Expose the port the app runs on
-EXPOSE 5000
+RUN flask db upgrade
 
 # Define environment variables
 ENV FLASK_APP=rentcar.py
+
+# Expose the port the app runs on
+EXPOSE 5000
 
 # Run the command to start the app
 CMD ["flask", "run", "--host", "0.0.0.0"]

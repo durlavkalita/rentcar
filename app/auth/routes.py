@@ -65,7 +65,7 @@ def login():
 def get_user_profile():
   current_user_id = get_jwt_identity()
   try:
-    user = User.query.get(current_user_id)
+    user = db.session.get(User, current_user_id)
     if user:
       user_data = {
         "id": user.id,
@@ -85,7 +85,7 @@ def get_user_profile():
 def get_profile_booking_list():
   try:
     current_user_id = get_jwt_identity()
-    user = User.query.get(current_user_id)
+    user = db.session.get(User, current_user_id)
     booking_list = []
     for booking in user.bookings:
       booking_data = {

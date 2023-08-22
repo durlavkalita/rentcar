@@ -68,7 +68,7 @@ def get_all_cars():
 @bp.route("/<int:id>", methods=['GET'])
 def get_car_by_id(id):
   try:
-    car = Car.query.get(id)
+    car = db.session.get(Car, id)
     if car:
       car_data = {
         "id": car.id,
@@ -92,7 +92,7 @@ def get_car_by_id(id):
 def book_car_by_id(id):
   try:
     current_user_id = get_jwt_identity()
-    car = Car.query.get(id)
+    car = db.session.get(Car, id)
     if not car:
       return jsonify(message="Car not found"), 404
     elif car.available != True:
@@ -128,7 +128,7 @@ def book_car_by_id(id):
 @bp.route("/<int:id>/bookings", methods=['GET'])
 def get_bookings_by_car_id(id):
   try:
-    car = Car.query.get(id)
+    car = db.session.get(Car, id)
     if not car:
       return jsonify(message="Car not found"), 404
     bookings = Booking.query.filter_by(car_id = id)
@@ -153,7 +153,7 @@ def get_bookings_by_car_id(id):
 def edit_car_by_id(id):
   try:
     current_user_id = get_jwt_identity()
-    car = Car.query.get(id)
+    car = db.session.get(Car, id)
     if not car:
       return jsonify(message="Car not found"), 404
     if car.business.owner_id != current_user_id:
@@ -177,7 +177,7 @@ def edit_car_by_id(id):
 def delete_car_by_id(id):
   try:
     current_user_id = get_jwt_identity()
-    car = Car.query.get(id)
+    car = db.session.get(Car, id)
     if not car:
       return jsonify(message="Car not found"), 404
     if car.business.owner_id != current_user_id:

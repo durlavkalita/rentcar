@@ -63,7 +63,7 @@ def get_all_business():
 @bp.route("/<int:id>", methods=['GET'])
 def get_business_by_id(id):
   try:
-    business = Business.query.get(id)
+    business = db.session.get(Business, id)
     if business:
       business_data = {
         "id": business.id,

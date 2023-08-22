@@ -6,7 +6,7 @@ servers:
   - url: http://localhost:5000 # Replace with your actual server URL
     description: Local development server
 paths:
-  /auth/register:
+  /register:
     post:
       summary: Register a new user
       tags: [Authentication]
@@ -29,7 +29,7 @@ paths:
           description: User registered successfully
         # Add other responses here
 
-  /auth/login:
+  /login:
     post:
       summary: Log in and obtain an access token
       tags: [Authentication]
@@ -59,7 +59,7 @@ paths:
                     type: string
                   # Add other properties here
 
-  /auth/profile:
+  /profile:
     get:
       summary: Get user profile
       tags: [Authentication]
@@ -89,7 +89,7 @@ paths:
                   # Add other properties here
                 # Add other response properties here
 
-  /auth/profile/booking:
+  /profile/booking:
     get:
       summary: Get user's bookings
       tags: [Authentication]

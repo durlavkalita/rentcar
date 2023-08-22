@@ -9,6 +9,13 @@ services:
     volumes:
       - .:/app
       - db:/app/db
+    depends_on:
+      - redis
+
+  redis:
+    image: "redis:latest"
+    ports:
+      - "6379:6379"
 
 volumes:
   db:

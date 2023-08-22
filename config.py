@@ -10,3 +10,6 @@ class Config(object):
         'sqlite:///' + os.path.join(basedir, 'app.db')
   SQLALCHEMY_TRACK_MODIFICATIONS = False
   API_URL = "/static/swagger.yaml"
+  SWAGGER_URL = "/api/docs"
+  REDIS_HOST = 'redis'
+  REDIS_PORT = 6379

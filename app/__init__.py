@@ -4,12 +4,13 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from flask_jwt_extended import JWTManager
 from flask_swagger_ui import get_swaggerui_blueprint
+from redis import Redis
+
+redis_client = Redis(host=Config.REDIS_HOST, port=Config.REDIS_PORT)
 
 db = SQLAlchemy()
 migrate = Migrate()
 jwt = JWTManager()
-
-
 
 def create_app(config_class = Config):
     app = Flask(__name__)

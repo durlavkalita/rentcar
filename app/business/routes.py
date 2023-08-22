@@ -3,6 +3,8 @@ from app.business import bp
 from flask import request, jsonify
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from app.models import Business, Car
+from app import redis_client
+import json
 
 @bp.route("/register", methods=['POST'])
 @jwt_required()
@@ -28,6 +30,8 @@ def register_business():
     db.session.add(new_business)
     db.session.commit()
 
+    redis_client.delete('business_list')
+    
     return jsonify(message="Business registered successfully"), 201
   except Exception as e:
     return jsonify(error=str(e)), 500
@@ -35,6 +39,10 @@ def register_business():
 @bp.route("/", methods=['GET'])
 def get_all_business():
   try:
+    cached_data = redis_client.get('business_list')
+    if cached_data:
+      retrieved_list = json.loads(cached_data)
+      return jsonify(retrieved_list), 200
     businesses = Business.query.all()
     business_list = []
     for business in businesses:
@@ -46,6 +54,8 @@ def get_all_business():
         "owner_id": business.owner_id
       }
       business_list.append(business_data)
+    json_business_list = json.dumps(business_list)
+    redis_client.setex('business_list', 3600, json_business_list)
     return jsonify(business_list), 200
   except Exception as e:
     return jsonify(error=str(e)), 500

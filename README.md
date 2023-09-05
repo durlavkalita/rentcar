@@ -1,3 +1,13 @@
+How to use -
+
+```
+git clone https://github.com/durlavkalita/rentcar.git
+
+docker-compose up -d
+```
+
+access the app @ http://localhost:5000
+
 Features -
 
 - User Registration:
